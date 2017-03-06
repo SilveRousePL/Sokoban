@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <string>
+#include <cstdint>
 
 #include "ResourceManager.hpp"
 #include "GameMap.hpp"
@@ -75,7 +76,7 @@ private:
     bool focus_on_player_;
 
     // Game vars
-    UINT32 level_id_;
+    uint32_t level_id_;
 
     ResourceManager manager_;
 	GameMap game_map_;
