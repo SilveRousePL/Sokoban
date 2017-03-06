@@ -17,13 +17,11 @@ Engine::Engine(std::string title, uint32_t width, uint32_t height)
         window_.setFramerateLimit(60);
         time_per_frame_ = sf::seconds(1.f / 60.f);
 
-        main_menu_.AddButton(*manager_.GetTexture(TEXTURE_ID::BTN_BG), *manager_.GetTexture(TEXTURE_ID::BTN_ACTIVE), manager_.GetFont(), "PLAY", ButtonType::MENU_PLAY,sf::Vector2f((window_.getSize().x/2)-100,100));
-        main_menu_.AddButton(*manager_.GetTexture(TEXTURE_ID::BTN_BG), *manager_.GetTexture(TEXTURE_ID::BTN_ACTIVE), manager_.GetFont(), "ABOUT", ButtonType::MENU_ABOUT,sf::Vector2f((window_.getSize().x / 2) - 100, 200));
-        main_menu_.AddButton(*manager_.GetTexture(TEXTURE_ID::BTN_BG), *manager_.GetTexture(TEXTURE_ID::BTN_ACTIVE), manager_.GetFont(), "EXIT", ButtonType::MENU_EXIT, sf::Vector2f((window_.getSize().x / 2) - 100, 300));
+        main_menu_.AddButton(*manager_.GetTexture(TEXTURE_ID::BTN_BG), *manager_.GetTexture(TEXTURE_ID::BTN_ACTIVE), manager_.GetFont(), "PLAY", ButtonType::MENU_PLAY,sf::Vector2f((window_.getSize().x/2.f)-100.f,100.f));
+        main_menu_.AddButton(*manager_.GetTexture(TEXTURE_ID::BTN_BG), *manager_.GetTexture(TEXTURE_ID::BTN_ACTIVE), manager_.GetFont(), "ABOUT", ButtonType::MENU_ABOUT,sf::Vector2f((window_.getSize().x / 2.f) - 100.f, 200.f));
+        main_menu_.AddButton(*manager_.GetTexture(TEXTURE_ID::BTN_BG), *manager_.GetTexture(TEXTURE_ID::BTN_ACTIVE), manager_.GetFont(), "EXIT", ButtonType::MENU_EXIT, sf::Vector2f((window_.getSize().x / 2.f) - 100.f, 300.f));
 
         //Show MainMenu
-        
-        
 
 
 	    //!Game map load and initialize assets
