@@ -38,6 +38,11 @@ bool GameMap::LoadMap(unsigned int level)
 
 	char *buffer = new char[33];
 
+	int level_width = 0;
+	int level_height = 0;
+
+	int max_width = level_width;
+
     while (file.peek() != EOF)
     {
 		file.getline(buffer, 33);
@@ -66,52 +71,29 @@ bool GameMap::LoadMap(unsigned int level)
 				break;
 			default:
 				ground_id_map_[y][i] = (int)MAP_ELEMENT::NONE;
-				break;
+				level_width--;
+				break;	
 			}
-		}
 
-		/*
-        while (x < map_size_x_)
-        {
-            temp = file.get();
-            switch (temp)
-            {
-            case '.':
-                ground_id_map_[y][x] = (int)MAP_ELEMENT::FLOOR;
-                break;
-            case '#':
-                ground_id_map_[y][x] = (int)MAP_ELEMENT::WALL;
-                break;
-            case 'p':
-                spawn_position_ = sf::Vector2f(64.f*x, 64.f*y);
-                ground_id_map_[y][x] = (int)MAP_ELEMENT::FLOOR;
-                break;
-            case 'X':
-                ++trigger_count_;
-                ground_id_map_[y][x] = (int)MAP_ELEMENT::FLOOR_TRIGGER;
-                break;
-            case 'o':
-                artifacts_.push_back(Artifact(64.f*x, 64.f*y, ptr_manager_));
-                ground_id_map_[y][x] = (int)MAP_ELEMENT::FLOOR;
-                break;
-            default:
-                ground_id_map_[y][x] = (int)MAP_ELEMENT::NONE;
-                break;
-            }
-            x++;
+			level_width++;
 			
-        }
-		
-        file.get();
-		*/
+		}
+		max_width = std::max(level_width, max_width);
+		level_width = 0;
+
         x = 0;
+
         y++;
+
+		level_height++;
 		memset(buffer, 0, sizeof(buffer));
     }
 
 	delete[] buffer;
     
     file.close();
+
+	current_level_size_ = sf::Vector2f(max_width, level_height);
 
     InitializePlayer();
 
@@ -228,29 +210,44 @@ void GameMap::InitializePlayer()
 
 bool GameMap::CheckArtifacts()
 {
-    unsigned int tr_counter = 0;
+    matched_count_ = 0;
 
     for (std::vector<Artifact>::iterator it = artifacts_.begin(); it != artifacts_.end(); ++it)
     {
         if(GetMapElementId(it->getPosition()) == 2 )
         {
             it->SetTrigger(true);
-            tr_counter++;
+			matched_count_++;
         }
         else
             it->SetTrigger(false);
         it->Update();
     }
 
-    if (tr_counter == trigger_count_)
+    if (matched_count_ == trigger_count_)
         return true;
     else
         return false;
 }
 
+const uint32_t & GameMap::GetArtifactsCount()
+{
+	return trigger_count_;
+}
+
+const uint32_t & GameMap::GetMatchedArtifactsCount()
+{
+	return matched_count_;
+}
+
 UINT32 GameMap::GetPlayerMoves()
 {
     return player_.GetMoveCounter();
+}
+
+const sf::Vector2f & GameMap::GetCurrentLevelSize()
+{
+	return current_level_size_;
 }
 
 void GameMap::ResetPlayer()

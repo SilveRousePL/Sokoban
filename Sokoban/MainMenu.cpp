@@ -16,6 +16,12 @@ void MainMenu::AddButton(sf::Texture & texture, sf::Texture & texture_click, sf:
     buttons_.push_back(Button(texture, texture_click, font,str,type, position));
 }
 
+void MainMenu::SetLogo(sf::Texture & texture, const sf::Vector2f & position)
+{
+	logo_.setTexture(texture);
+	logo_.setPosition(position);
+}
+
 
 void MainMenu::CheckPosition(sf::Vector2i mouse)
 {
@@ -51,7 +57,9 @@ ButtonType MainMenu::CheckClick(sf::Vector2i mouse)
 
 void MainMenu::draw(sf::RenderTarget & target, sf::RenderStates states) const
 {
-    target.clear(sf::Color(0x66, 0x66, 0x66, 255));
+    target.clear(sf::Color(0x1f, 0x1f, 0x1f, 0));
+	
+	target.draw(logo_,states);
     for (std::vector<Button>::const_iterator it = buttons_.begin(); it != buttons_.end(); ++it)
-        target.draw(*it);
+        target.draw(*it,states);
 }

@@ -6,7 +6,7 @@ Engine::Engine(std::string title, uint32_t width, uint32_t height)
     ,zoom_factor_(0.1f)
     ,focus_on_player_(0)
     ,no_error_ (1)
-    ,level_id_(1)
+    ,level_id_(0)
     ,state_(GameState::MENU)
 {
     if (!PrepareResources())
@@ -17,15 +17,17 @@ Engine::Engine(std::string title, uint32_t width, uint32_t height)
         window_.setFramerateLimit(60);
         time_per_frame_ = sf::seconds(1.f / 60.f);
 
-        main_menu_.AddButton(*manager_.GetTexture(TEXTURE_ID::BTN_BG), *manager_.GetTexture(TEXTURE_ID::BTN_ACTIVE), manager_.GetFont(), "PLAY", ButtonType::MENU_PLAY,sf::Vector2f((window_.getSize().x/2.f)-100.f,100.f));
-        main_menu_.AddButton(*manager_.GetTexture(TEXTURE_ID::BTN_BG), *manager_.GetTexture(TEXTURE_ID::BTN_ACTIVE), manager_.GetFont(), "ABOUT", ButtonType::MENU_ABOUT,sf::Vector2f((window_.getSize().x / 2.f) - 100.f, 200.f));
-        main_menu_.AddButton(*manager_.GetTexture(TEXTURE_ID::BTN_BG), *manager_.GetTexture(TEXTURE_ID::BTN_ACTIVE), manager_.GetFont(), "EXIT", ButtonType::MENU_EXIT, sf::Vector2f((window_.getSize().x / 2.f) - 100.f, 300.f));
+		main_menu_.SetLogo(*manager_.GetTexture(TEXTURE_ID::UI_LOGO),sf::Vector2f((window_.getSize().x / 2.f) - 250.f, 50.f));
+        main_menu_.AddButton(*manager_.GetTexture(TEXTURE_ID::UI_PLAY), *manager_.GetTexture(TEXTURE_ID::UI_PLAY_ACTIVE), manager_.GetFont(), "", ButtonType::MENU_PLAY,sf::Vector2f((window_.getSize().x/2.f)-100.f,300.f));
+        main_menu_.AddButton(*manager_.GetTexture(TEXTURE_ID::UI_ABOUT), *manager_.GetTexture(TEXTURE_ID::UI_ABOUT_ACTIVE), manager_.GetFont(), "", ButtonType::MENU_ABOUT,sf::Vector2f((window_.getSize().x / 2.f) - 100.f, 400.f));
+        main_menu_.AddButton(*manager_.GetTexture(TEXTURE_ID::UI_EXIT), *manager_.GetTexture(TEXTURE_ID::UI_EXIT_ACTIVE), manager_.GetFont(), "", ButtonType::MENU_EXIT, sf::Vector2f((window_.getSize().x / 2.f) - 100.f, 500.f));
 
         //Show MainMenu
 
 
 	    //!Game map load and initialize assets
-	    game_map_.LoadMap(1);
+		LoadNextLevel();
+	    //game_map_.LoadMap(1);
         game_map_.PrintToConsole();
 
         // For setting up player and artifacts
@@ -33,17 +35,16 @@ Engine::Engine(std::string title, uint32_t width, uint32_t height)
 
         
 
-	    //! Prepare view 
-        sf::Vector2f view_center_pos = sf::Vector2f((game_map_.GetMapWidth()/2) * sprite_offset_, (game_map_.GetMapHeight()/2) * sprite_offset_);
+	    //! Prepare view
 
 	    main_view_.setSize(default_size_); // default = 1280 x 720
-        main_view_.setCenter(view_center_pos);
         main_view_.zoom(2.f);
         main_view_.setViewport(sf::FloatRect(0, 0, 1, 1));
 
 
         player_ui_.SetFont(manager_.GetFont());
         player_ui_.SetBackground(*manager_.GetTexture(TEXTURE_ID::UI_BACKGROUND));
+		player_ui_.SetObjects(*manager_.GetTexture(TEXTURE_ID::OBJECT_GLOW));
 
         ui_view_.setViewport(sf::FloatRect(0,0,1,1));
 
@@ -57,11 +58,15 @@ Engine::~Engine()
 
 void Engine::Run()
 {
+	main_music_.play();
+	
 	while (window_.isOpen())
 	{
 
         player_ui_.SetMovesCounter(game_map_.GetPlayerMoves());
-        window_.setTitle("Sokoban || Moves: " + UtilityFunctions::IntToString(game_map_.GetPlayerMoves()));
+		player_ui_.SetDisplayedObjectsCount(game_map_.GetMatchedArtifactsCount());
+
+        window_.setTitle("Sokoban || Level: "+  std::to_string(level_id_) + "|| Moves: " + UtilityFunctions::IntToString(game_map_.GetPlayerMoves()));
 
         Render();
 
@@ -155,7 +160,7 @@ void Engine::ProceedEvents()
                 if (ButtonType::MENU_PLAY == main_menu_.CheckClick(sf::Mouse::getPosition(window_)))
                     state_ = GameState::PLAY;
                 else if (ButtonType::MENU_ABOUT == main_menu_.CheckClick(sf::Mouse::getPosition(window_)))
-                    MessageBox(0, "Remake of classic Sokoban game\nSome practice! :D\nMade by: Krzysztof Begiedza", "About", MB_OK | MB_ICONINFORMATION);
+                    MessageBox(0, "Remake of classic Sokoban game\nCode: Krzysztof Begiedza\nUI/art: Joanna Lubanska\nSpecial thanks to Kenney", "About", MB_OK | MB_ICONINFORMATION);
                 else if (ButtonType::MENU_EXIT == main_menu_.CheckClick(sf::Mouse::getPosition(window_)))
                     Exit();
 
@@ -200,6 +205,8 @@ void Engine::ProceedEvents()
 
 bool Engine::PrepareResources()
 { 
+	if (!manager_.LoadTexture(TEXTURE_ID::UI_LOGO, "data/img/logo.png"))
+		return false;
 	if (!manager_.LoadTexture(TEXTURE_ID::FLOOR, "data/img/floor.png"))
 		return false;
     if (!manager_.LoadTexture(TEXTURE_ID::FLOOR_TRIGGER, "data/img/floor_trigger.png"))
@@ -214,13 +221,25 @@ bool Engine::PrepareResources()
         return false;
     if (!manager_.LoadTexture(TEXTURE_ID::UI_BACKGROUND, "data/img/ui_bg.png"))
         return false;
-    if (!manager_.LoadTexture(TEXTURE_ID::BTN_BG, "data/img/btn.png"))
+    if (!manager_.LoadTexture(TEXTURE_ID::UI_PLAY, "data/img/play.png"))
         return false;
-    if (!manager_.LoadTexture(TEXTURE_ID::BTN_ACTIVE, "data/img/btn_pressed.png"))
-        return false;
+	if (!manager_.LoadTexture(TEXTURE_ID::UI_PLAY_ACTIVE, "data/img/play_active.png"))
+		return false;
+	if (!manager_.LoadTexture(TEXTURE_ID::UI_ABOUT, "data/img/about.png"))
+		return false;
+	if (!manager_.LoadTexture(TEXTURE_ID::UI_ABOUT_ACTIVE, "data/img/about_active.png"))
+		return false;
+	if (!manager_.LoadTexture(TEXTURE_ID::UI_EXIT, "data/img/exit.png"))
+		return false;
+	if (!manager_.LoadTexture(TEXTURE_ID::UI_EXIT_ACTIVE, "data/img/exit_active.png"))
+		return false;
     if (!manager_.LoadFont("data/fonts/Quikhand.ttf")) // (!manager_.LoadFont("data/fonts/BLKCHCRY.ttf"))
         return false;
 
+	if(!main_music_.openFromFile("data/audio/alienblues.flac"))
+		return false;
+	main_music_.setLoop(true);
+	main_music_.setVolume(50);
 	return true;
 }
 
@@ -252,29 +271,53 @@ void Engine::ResetLevel()
 
 void Engine::LoadNextLevel()
 {
-    
-    if (MessageBox(0, "Czy wczytaæ kolejn¹ mapê?", "Next level?", MB_YESNO | MB_ICONQUESTION) == IDYES)
-    {
-        if (!game_map_.LoadMap(level_id_+1))
-        {
-            if (MessageBox(0, "Map loading fault", "ERROR", MB_ICONERROR | MB_OK) == IDOK)
-                Exit();
-            return;
-        }
-        level_id_++;
-    }
-    else
-        Exit();
 
+	if (level_id_ != 0)
+	{
+		if (MessageBox(0, "Do you want to load next level?", "Next level?", MB_YESNO | MB_ICONQUESTION) == IDYES)
+		{
+			if (!game_map_.LoadMap(level_id_+1))
+			{
+				if (MessageBox(0, "Map loading fault", "ERROR", MB_ICONERROR | MB_OK) == IDOK)
+					Exit();
+				return;
+			}
+			level_id_++;
+		}
+		else
+			Exit();
+	}
+	else
+	{
+		if (!game_map_.LoadMap(level_id_ + 1))
+		{
+			if (MessageBox(0, "Map loading fault", "ERROR", MB_ICONERROR | MB_OK) == IDOK)
+				Exit();
+			return;
+		}
+		level_id_++;
+
+		
+	} 
+	player_ui_.SetMaximumObjectsCount(game_map_.GetArtifactsCount());
+
+
+	sf::Vector2f view_center_pos = game_map_.GetCurrentLevelSize() * sprite_offset_ /2.f;
+
+	main_view_.setCenter(view_center_pos);
+
+
+	/*
     //! DEBUG:
     std::cout << "LVL: " << level_id_ << std::endl;
     game_map_.PrintToConsole();
     std::cout << std::endl;
+	*/
 }
 
 void Engine::Exit()
 {
-   if(MessageBox(0, "Czy chcesz wyjœæ?", "wyjœcie?", MB_YESNO | MB_ICONQUESTION) != IDYES)
+   if(MessageBox(0, "Are you sure?", "Exit", MB_YESNO | MB_ICONQUESTION) != IDYES)
         return;
    window_.close();
         

@@ -3,6 +3,7 @@
 #define ENGINE_HPP_
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <Windows.h>
 
 #include <iostream>
@@ -56,7 +57,7 @@ private:
     void Exit();
 
 private:
-    // FOR PREPARE
+    // FOR RESOURCES PREPARE
     bool no_error_;
     const sf::Vector2f default_size_ = sf::Vector2f(1280, 720);
     const float sprite_offset_ = 64.f;
@@ -68,7 +69,7 @@ private:
     sf::Clock clock_;
     sf::View ui_view_;
 	sf::View main_view_;
-    
+	sf::Music main_music_;
 
     // View vars
     float view_zoom_;
@@ -85,6 +86,8 @@ private:
     //User Interface
     PlayerUI player_ui_;
     MainMenu main_menu_;
+
+	
 };
 
 #endif // ENGINE_HPP_

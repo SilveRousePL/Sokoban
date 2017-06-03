@@ -18,11 +18,15 @@ public:
 
     void AddButton(sf::Texture & texture, sf::Texture & texture_click, sf::Font & font, std::string str, ButtonType type, sf::Vector2f position = sf::Vector2f(0, 0));
 
+	void SetLogo(sf::Texture & texture,const sf::Vector2f & position);
+
     void CheckPosition(sf::Vector2i mouse);
     
     ButtonType CheckClick(sf::Vector2i mouse);
 private:
     std::vector<Button> buttons_;
+
+	sf::Sprite logo_;
 
 private:
 

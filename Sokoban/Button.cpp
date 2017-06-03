@@ -16,11 +16,10 @@ Button::Button(sf::Texture & texture, sf::Texture & texture_click, sf::Font & fo
 
     btn_text_.setPosition(position);
 
+	btn_text_.setString(str);
     btn_text_.setFont(font);
-    btn_text_.setColor(sf::Color(0x66, 0x66, 0x66, 255));
-    btn_text_.move(10, 0);
-
-    btn_text_.setString(str);
+    btn_text_.setColor(sf::Color(0x1f, 0x1f, 0x1f, 255));
+	btn_text_.move((btn_bg_.getTexture()->getSize().x - (str.length() * 12.5f)) / 2, (btn_bg_.getTexture()->getSize().y - 35) / 2);
 
     setPosition(position);
 }
@@ -56,8 +55,8 @@ void Button::ChangeSprite(bool b)
 void Button::SetFont(sf::Font & font)
 {
     btn_text_.setFont(font);
-    btn_text_.setColor(sf::Color(0x66, 0x66, 0x66, 255));
-    btn_text_.move(10, 0);
+	btn_text_.setCharacterSize(24);
+	btn_text_.setColor(sf::Color(0x66, 0x66, 0x66, 255));
 }
 
 

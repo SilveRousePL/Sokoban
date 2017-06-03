@@ -88,7 +88,13 @@ public:
 	////////////////////////////////////////
     bool CheckArtifacts();
 
-    UINT32 GetPlayerMoves();
+	const uint32_t & GetArtifactsCount();
+
+	const uint32_t & GetMatchedArtifactsCount();
+
+    uint32_t GetPlayerMoves();
+
+	const sf::Vector2f & GetCurrentLevelSize();
 
     void ResetPlayer();
 
@@ -122,6 +128,10 @@ private:
     std::vector<Artifact> artifacts_;                               ///< artifact vector
 
     unsigned int trigger_count_;									///< artifacts counter
+
+	unsigned int matched_count_;									///< matched artifacts counter
+
+	sf::Vector2f current_level_size_;
 };
 
 #endif //MAP_HPP_
