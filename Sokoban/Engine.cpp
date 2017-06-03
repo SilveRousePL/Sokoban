@@ -15,6 +15,9 @@ Engine::Engine(std::string title, uint32_t width, uint32_t height)
     {
         window_.create(sf::VideoMode(width, height), title);
         window_.setFramerateLimit(60);
+
+		window_.setIcon(64, 64, icon_.getPixelsPtr());
+
         time_per_frame_ = sf::seconds(1.f / 60.f);
 
 		main_menu_.SetLogo(*manager_.GetTexture(TEXTURE_ID::UI_LOGO),sf::Vector2f((window_.getSize().x / 2.f) - 250.f, 50.f));
@@ -205,6 +208,10 @@ void Engine::ProceedEvents()
 
 bool Engine::PrepareResources()
 { 
+
+	if (!icon_.loadFromFile("data/img/Sokoban.png"))
+		return false;
+
 	if (!manager_.LoadTexture(TEXTURE_ID::UI_LOGO, "data/img/logo.png"))
 		return false;
 	if (!manager_.LoadTexture(TEXTURE_ID::FLOOR, "data/img/floor.png"))

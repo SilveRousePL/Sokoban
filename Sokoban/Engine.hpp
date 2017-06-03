@@ -71,6 +71,8 @@ private:
 	sf::View main_view_;
 	sf::Music main_music_;
 
+	sf::Image icon_;
+
     // View vars
     float view_zoom_;
     float zoom_factor_;
